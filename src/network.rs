@@ -35,3 +35,27 @@ pub async fn another_health_check() -> Result<(), Box<dyn std::error::Error>> {
     );
     Ok(())
 }
+
+/// Downloads a file from the specified URL and saves it to the system root (C: drive)
+/// 
+/// # Arguments
+/// 
+/// * `url` - The URL of the file to download
+/// * `filename` - The name to save the file as on the C: drive
+/// 
+/// # Returns
+/// 
+/// * `Result<(), Box<dyn std::error::Error>>` - Ok if successful, Err if the download or save operation fails
+#[tokio::main]
+pub async fn download_file(url: &str, filename: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let response = reqwest::get(url).await?;
+    if !response.status().is_success() {
+        return Err(format!("Failed to download file: HTTP {}", response.status()).into());
+    }
+    
+    let mut file = std::fs::File::create(format!("C:\\{}", filename))?;
+    let content = response.bytes().await?;
+    std::io::copy(&mut content.as_ref(), &mut file)?;
+    
+    Ok(())
+}
