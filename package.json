@@ -1,0 +1,16 @@
+{
+  "name": "http_req",
+  "version": "1.0.0",
+  "description": "TypeScript client for reading health check response from Rust",
+  "main": "health_check.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node health_check.ts"
+  },
+  "dependencies": {
+    "@types/node": "^20.0.0",
+    "fs": "^0.0.1-security",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  }
+}

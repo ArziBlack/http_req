@@ -1,21 +1,23 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Data {
-    status: i32,
-    success: bool,
-    message: String,
+pub struct Data {
+    pub status: i32,
+    pub success: bool,
+    pub message: String,
 }
 
 #[tokio::main]
-pub async fn health_check() -> Result<(), Box<dyn std::error::Error>> {
+pub async fn health_check() -> Result<Data, Box<dyn std::error::Error>> {
     let response = reqwest::get("https://f3d-server.onrender.com/api/v1/health-check")
         .await?
-        .json::<HashMap<String, String>>()
+        .text()
         .await?;
-    println!("{response:#?}");
-    Ok(())
+    println!("{response}");
+    let json_res: Data = serde_json::from_str(&response)?;
+    
+    std::fs::write("C:\\Users\\bunak\\Development\\health_check_response.json", &response)?;
+    Ok(json_res)
 }
 
 #[tokio::main]
@@ -58,4 +60,19 @@ pub async fn download_file(url: &str, filename: &str) -> Result<(), Box<dyn std:
     std::io::copy(&mut content.as_ref(), &mut file)?;
     
     Ok(())
+}
+
+#[tokio::main]
+pub async fn get_location() -> Result<geolocation::Locator, Box<dyn std::error::Error>> {
+    let location = geolocation::find("105.113.64.77").unwrap();
+    println!("Location Information:");
+    println!("  IP: {}", location.ip);
+    println!("  Latitude: {}", location.latitude);
+    println!("  Longitude: {}", location.longitude);
+    println!("  City: {}", location.city);
+    println!("  Region: {}", location.region);
+    println!("  Country: {}", location.country);
+    println!("  Timezone: {}", location.timezone);
+    println!("  Location: {}", location.location);
+    Ok(location)
 }
