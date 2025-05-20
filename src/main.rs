@@ -1,4 +1,5 @@
 pub mod network;
+pub mod operations;
 
 use network::{another_health_check, download_batch_export_forms_zip, download_file, health_check};
 
@@ -24,6 +25,11 @@ fn main() {
     match download_batch_export_forms_zip() {
         Ok(_) => println!("File downloaded successfully!"),
         Err(e) => eprintln!("Failed to download file: {}", e),
+    }
+
+    match operations::unzip_file("C:\\batch_export_forms.zip", "C:\\unzipped") {
+        Ok(_) => println!("File unzipped successfully!"),
+        Err(e) => eprintln!("Failed to unzip file: {}", e),
     }
 
     match network::get_location() {
