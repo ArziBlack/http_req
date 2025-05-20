@@ -63,6 +63,36 @@ pub async fn download_file(url: &str, filename: &str) -> Result<(), Box<dyn std:
 }
 
 #[tokio::main]
+pub async fn download_batch_export_forms_zip() -> Result<(), Box<dyn std::error::Error>> {
+    let body = serde_json::json!({
+        "html": [
+            "<h1>First Document</h1><p>Content 1</p>",
+            "<h1>Second Document</h1><p>Content 2</p>"
+        ],
+        "filenames": [
+            "Invoice-001",
+            "Contract-2025"
+        ]
+    });
+    
+    let client = reqwest::Client::new();
+    let response = client.post("https://f3d-server.onrender.com/api/v1/forms/export?client_id=680624347a2e786232986db6&format=pdf")
+        .json(&body)
+        .send()
+        .await?;
+        
+    if !response.status().is_success() {
+        return Err(format!("Failed to download file: HTTP {}", response.status()).into());
+    }
+    
+    let mut file = std::fs::File::create(format!("C:\\{}", "batch_export_forms.zip"))?;
+    let content = response.bytes().await?;
+    std::io::copy(&mut content.as_ref(), &mut file)?;
+    
+    Ok(())
+}
+
+#[tokio::main]
 pub async fn get_location() -> Result<geolocation::Locator, Box<dyn std::error::Error>> {
     let location = geolocation::find("105.113.64.77").unwrap();
     println!("Location Information:");
